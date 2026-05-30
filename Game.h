@@ -21,8 +21,8 @@ private:
 
     ShipController shipController;
 
-    Board playerBoard;
-    Board enemyBoard;
+    board playerBoard;
+    board enemyBoard;
 
     Player* player = nullptr;
     Player* enemy = nullptr;
