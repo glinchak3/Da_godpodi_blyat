@@ -37,6 +37,8 @@ bool board::can_shoot(cell wanted_cell) const {
     int x = wanted_cell.get_x();
     int y = wanted_cell.get_y();
 
+    if (x < 0 || x >= 10 || y < 0 || y >= 10) return false;
+
     return grid[y][x] == '.' || grid[y][x] == 'S';
 }
 
