@@ -21,14 +21,11 @@ private:
 
     ShipController shipController;
 
-    board human_board;
-    board computer_board;
+    Board playerBoard;
+    Board enemyBoard;
 
     Player* player = nullptr;
     Player* enemy = nullptr;
-
-    bool human_turn;
-    bool computer_turn;
 
     void handle_events();
     void update();
@@ -39,5 +36,6 @@ private:
 public:
     Game();
     ~Game();
+
     void run();
 };
