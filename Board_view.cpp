@@ -11,10 +11,10 @@ bool BoardView::load(const std::string& path, sf::Vector2f pos, sf::Vector2f win
 
     auto size = texture.getSize();
 
-    float scale = std::min(windowSize.x / size.x, windowSize.y / size.y);
+    float scale = 0.40f;
 
     sprite.setScale(scale, scale);
-    sprite.setOrigin(size.x / 2.f, size.y / 2.f);
+    sprite.setOrigin(0.f, 0.f);
     sprite.setPosition(pos);
 
     bounds = sprite.getGlobalBounds();
@@ -36,35 +36,39 @@ sf::Vector2f BoardView::cellToScreen(int x, int y) const
 {
     sf::FloatRect b = sprite.getGlobalBounds();
 
-    float cellW = b.width / 10.f; //собственно сам перевод
-    float cellH = b.height / 10.f; 
+    float cellW = b.width / 11.f;
+    float cellH = b.height / 11.f;
 
     return {
-        b.left + x * cellW + cellW / 2.f,//
-        b.top  + y * cellH + cellH / 2.f
+        b.left + x * cellW + 5.0f,
+        b.top  + y * cellH + 2.0f
     };
 }
 
 //перевод сетки из пикселей в сетку из координат
 sf::Vector2i BoardView::screenToCell(sf::Vector2f pos) const
 {
-    sf::FloatRect b = sprite.getGlobalBounds(); //берём границы доски
+    sf::FloatRect b = sprite.getGlobalBounds();
 
-    if (!b.contains(pos)) // попала ли клетка в доску
+    if (!b.contains(pos))
         return {-1, -1};
 
-    float cellW = b.width / 10.f; // считаем размер клетки
-    float cellH = b.height / 10.f;
+    float cellW = b.width / 11.f;
+    float cellH = b.height / 11.f;
 
-    int x = int((pos.x - b.left) / cellW); // убираем смещение доски
+    int x = int((pos.x - b.left) / cellW);
     int y = int((pos.y - b.top)  / cellH);
 
     return {x, y};
 }
 
-//получить позицию для ship в координатах сетки
-sf::Vector2i ship_view::getCell(const BoardView& board) const
+void BoardView::setOffset(sf::Vector2f off)
 {
-    sf::Vector2f pos = sprite.getPosition();
-    return board.screenToCell(pos);
+    offset = off;
+}
+
+void BoardView::setParams(sf::Vector2f origin, float size)
+{
+    boardOrigin = origin;
+    cellSize = size;
 }

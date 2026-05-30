@@ -1,5 +1,4 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -16,16 +15,21 @@ private:
     sf::RenderWindow window;
     sf::Event event;
 
+    float cellSize = 40.f;
+float boardSize = cellSize * 10.f;
+
     BoardView playerBoardView;
     BoardView enemyBoardView;
 
-    ShipController shipController;
+    ship_controller shipController;
 
     board playerBoard;
     board enemyBoard;
 
-    Player* player = nullptr;
-    Player* enemy = nullptr;
+    sf::Texture t4, t3, t2, t1;
+
+   // Player* player = nullptr;
+   // Player* enemy = nullptr;
 
     void handle_events();
     void update();
@@ -35,7 +39,7 @@ private:
 
 public:
     Game();
-    ~Game();
+    //~Game();
 
     void run();
 };

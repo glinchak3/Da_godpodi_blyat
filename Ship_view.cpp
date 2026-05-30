@@ -2,10 +2,13 @@
 // будем создавать спрайт из готовой текстуры (её создали в game)
 void ship_view::setTexture(sf::Texture& tex, float scale){
     sprite.setTexture(tex);
-    sprite.setScale(scale, scale);
+sprite.setScale(scale, scale);
 
-    auto size = tex.getSize();
-    sprite.setOrigin(size.x / 2.f, size.y / 2.f);
+auto size = tex.getSize();
+sprite.setOrigin(
+    (size.x * scale) / 2.f,
+    (size.y * scale) / 2.f
+);
 }
 
 // получает координаты корабля на поле В ПИКСЕЛЯХ
@@ -29,3 +32,10 @@ void ship_view::draw(sf::RenderWindow& window){
 sf::Sprite& ship_view::getSprite(){
     return sprite;
 }
+
+//получить позицию для ship в координатах сетки
+//sf::Vector2i ship_view::getCell(const BoardView& board) const
+//{
+    //sf::Vector2f pos = sprite.getPosition();
+    //return board.screenToCell(pos);
+//}

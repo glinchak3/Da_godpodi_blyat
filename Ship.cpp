@@ -1,3 +1,4 @@
+
 #include "Ship.h"
 
 ship::ship(int Size, std::vector<cell> Cells, std::vector<bool> Hit_cells) {
