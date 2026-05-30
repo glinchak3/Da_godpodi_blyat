@@ -33,7 +33,7 @@ bool board::shoot(cell Shoot_cell) {
 }
 
 bool board::can_shoot(cell wanted_cell) const {
-
+    std::lock_guard<std::mutex> lock(mtx);
     int x = wanted_cell.get_x();
     int y = wanted_cell.get_y();
 

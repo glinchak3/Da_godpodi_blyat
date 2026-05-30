@@ -34,7 +34,19 @@ void ComputerPlayer::count_free_sect(int start_x, int end_x, int start_y, int en
     }
 }
 
-cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2) {
+cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth = 0, int max_depth = 3) {
+
+    if (depth >= max_depth) {
+        int count1 = 0, count2 = 0;
+        count_free_sect(x1, x2, y1, y2, count1);
+        // В зависимости от результатов, выбрать сторону
+        if (count1 > 0) {
+            return cell(x1, y1); // или другая логика
+        } else {
+            return cell(-1, -1);
+        }
+    }
+    
     if (x1 == x2 && y1 == y2) {
         return enemy_board.can_shoot(cell(x1, y1)) ? cell(x1, y1) : cell(-1, -1);
     } 
@@ -61,9 +73,9 @@ cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2) {
     t2.join(); 
 
     if ((count1 >= count2) && (count1 > 0)) {
-        return find_sector(x1, mid_x1, y1, mid_y1);
+        return find_sector(x1, mid_x1, y1, mid_y1, depth + 1, max_depth);
     } else if (count2 > 0) {
-        return find_sector(start_x2, x2, start_y2, y2);
+        return find_sector(start_x2, x2, start_y2, y2, depth + 1, max_depth);
     }
     return cell(-1, -1);
 }

@@ -10,6 +10,7 @@ class board{
     private:
         int size = 100;
         std::vector<std::vector<char>> grid;
+        mutable std::mutex mtx;
     public:
         board(); 
         void place_ship(ship & Ship);
