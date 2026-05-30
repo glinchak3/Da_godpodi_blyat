@@ -1,0 +1,43 @@
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include <vector>
+
+#include "Board_view.h"
+#include "Ship_controller.h"
+
+#include "Board.h"
+#include "Player.h"
+#include "Ship.h"
+
+class Game
+{
+private:
+    sf::RenderWindow window;
+    sf::Event event;
+
+    BoardView playerBoardView;
+    BoardView enemyBoardView;
+
+    ShipController shipController;
+
+    board human_board;
+    board computer_board;
+
+    Player* player = nullptr;
+    Player* enemy = nullptr;
+
+    bool human_turn;
+    bool computer_turn;
+
+    void handle_events();
+    void update();
+    void render();
+
+    void init();
+
+public:
+    Game();
+    ~Game();
+    void run();
+};
