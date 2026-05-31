@@ -4,19 +4,21 @@
 #include <vector>
 #include "Board_view.h"
 
-class hit_view
+class ShotView
 {
 private:
-    sf::Texture texture;
+    sf::Texture hitTexture;
+    sf::Texture missTexture;
+
     std::vector<sf::Vector2i> hits;
+    std::vector<sf::Vector2i> misses;
 
 public:
-    // загрузка текстуры огонька
-    bool load(const std::string& path);
+    bool loadHit(const std::string& path);
+    bool loadMiss(const std::string& path);
 
-    // добавить попадание
     void addHit(sf::Vector2i cell);
+    void addMiss(sf::Vector2i cell);
 
-    // отрисовка всех огоньков
     void draw(sf::RenderWindow& window, const BoardView& board);
 };

@@ -14,15 +14,20 @@ private:
     bool vertical = false;
 
     BoardView* activeBoard = nullptr;
+    bool ON = false;
 
 public:
-    void add_ship(const ship_view& ship);
+    bool get_ON();
 
+    void add_ship(const ship_view& ship);
     void setBoard(BoardView* board);
 
-    std::vector<sf::Vector2i> handle_event(const sf::Event& e, const sf::RenderWindow& window);
+    std::vector<sf::Vector2i> handle_event(
+        const sf::Event& e,
+        const sf::RenderWindow& window);
+
     void update(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 
-    std::vector<sf::Vector2i>& get_current_ship();
+    ship_view& get_current_ship();
 };

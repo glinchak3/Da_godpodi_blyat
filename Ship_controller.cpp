@@ -1,5 +1,9 @@
 #include "Ship_controller.h"
 
+bool ship_controller::get_ON(){
+    return ON;
+}
+
 //добавление корабыль в список визуальных кораблей
 void ship_controller::add_ship(const ship_view& ship){ 
     ships.push_back(ship);
@@ -10,19 +14,28 @@ void ship_controller::setBoard(BoardView* board){
     activeBoard = board;
 }
 
-//реагирует на ввод игрока
-std::vector<sf::Vector2i> ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& window){
+std::vector<sf::Vector2i> ship_controller::handle_event(
+    const sf::Event& e,
+    const sf::RenderWindow& window)
+{
+    int flag = 0;
 
-    //переключение мышью закреплено или откреплено
-    if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left){
+    std::vector<sf::Vector2i> ship; // <-- здесь
+
+    if (e.type == sf::Event::MouseButtonPressed &&
+        e.mouseButton.button == sf::Mouse::Left)
+    {
         locked = !locked;
     }
 
-    // меняем активный корабль на новый при окончательном закреплении предыдущего
-    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y){
-        if (locked){
-            // МЕСТО СШИВКИ
-            sf::Vector2i ship = ships[current_ship].get_ship_cells(*activeBoard);//получаем клетку для корабля
+    if (e.type == sf::Event::KeyPressed &&
+        e.key.code == sf::Keyboard::Y)
+    {
+        if (locked)
+        {
+            flag++;
+            ship = ships[current_ship].get_ship_cells(*activeBoard);
+
             current_ship++;
 
             if (current_ship >= (int)ships.size())
@@ -32,12 +45,17 @@ std::vector<sf::Vector2i> ship_controller::handle_event(const sf::Event& e, cons
         }
     }
 
-    // поворот
-    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::R){
+    if (e.type == sf::Event::KeyPressed &&
+        e.key.code == sf::Keyboard::R)
+    {
         vertical = !vertical;
         ships[current_ship].setRotation(vertical);
     }
-    return ship
+
+    if (flag == 9)
+        ON = true;
+
+    return ship;
 }
 
 // обновление состояний корабля

@@ -1,3 +1,6 @@
+#include <atomic>
+#include <thread>
+
 #include "Game.h"
 #include <chrono>
 
@@ -60,7 +63,8 @@ void Game::init(){
     player = new HumanPlayer(playerBoard, enemyBoard);
     enemy  = new ComputerPlayer(enemyBoard, playerBoard);
 
-    fier_view.load("images/Fire.png");
+    fier_view.loadHit("images/Fier.png");
+    fier_view.loadMiss("images/Miss.png");
 
     // Автоматическая расстановка всего флота робота на старте
     enemy->place_ship(ship(0, {}));
@@ -84,7 +88,7 @@ void Game::handle_events()
             // Если вектор координат не пустой — значит, игрок успешно зафиксировал корабль на карте
             if (!coords_list.empty()) {
                 ship new_ship(coords_list);
-                player->place_ship(new_ship); // ИСПРАВЛЕНО: Обращение через указатель ->
+                player->place_ship(new_ship); ; // ИСПРАВЛЕНО: Обращение через указатель ->
 
                 // Проверяем автоматический переход к бою: если расставлено 10 кораблей
             
@@ -136,6 +140,7 @@ void Game::run()
 
         if (state == GameState::PlayerTurn) {
            // Срабатывает один раз в момент нажатия
+            bool isPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
             if (isPressed && !wasPressed){
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                 sf::Vector2f coords = window.mapPixelToCoords(mousePos);
@@ -149,9 +154,19 @@ void Game::run()
                     if (enemyBoard.can_shoot(shotCell)){
                         bool hit = enemyBoard.shoot(shotCell);
                         if (hit){
-                            fier_view.addHit(shotCell);   //  огонь
+                            fier_view.addHit(
+                                sf::Vector2i(
+                                    shotCell.get_x(),
+                                    shotCell.get_y()
+                                )
+                            );   //  огонь
                         } else {
-                            fier_view.addMiss(shotCell);  //  крестик
+                            fier_view.addMiss(
+                                sf::Vector2i(
+                                    shotCell.get_x(),
+                                    shotCell.get_y()
+                                )
+                            );  //  крестик
                         }
 
                         if (enemyBoard.victory()) {
@@ -177,9 +192,9 @@ void Game::run()
             
             if (hit) {
                 // Если робот попал, передаем координату выстрела в систему отрисовки огня
-                fier_view.addHit(enemyShot); 
+                fier_view.addHit(enemyShot.to_sf()); 
             } else {
-                fier_view.addMiss(enemyShot);  //  крестик
+                fier_view.addMiss(enemyShot.to_sf());  //  крестик
             }
 
             if (playerBoard.victory()) {

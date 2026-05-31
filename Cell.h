@@ -3,6 +3,9 @@
 #include <iostream>
 #include <mutex>
 
+#pragma once
+#include <SFML/System/Vector2.hpp>
+
 
 
 class cell{
@@ -18,4 +21,7 @@ class cell{
         int get_y() const{
             return y;
         };
+        sf::Vector2i to_sf() const {
+            return sf::Vector2i(x, y);
+        }
 };

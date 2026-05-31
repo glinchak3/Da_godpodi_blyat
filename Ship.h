@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/System/Vector2.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -18,7 +19,7 @@ class ship{
         ship(std::vector<sf::Vector2i> cells);
         void mark_hit_cell(cell Hit_cell);
         bool is_dead();
-        std::vector<cell> get_hit_cells();
+        std::vector<cell> get_hit_cells() const;;
         int get_size();
         std::vector<cell> get_cells();
 };

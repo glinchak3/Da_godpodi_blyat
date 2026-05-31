@@ -1,29 +1,42 @@
 #include "Fier_view.h"
 
-// загрузка текстуры
-bool hit_view::load(const std::string& path)
+bool ShotView::loadHit(const std::string& path)
 {
-    return texture.loadFromFile(path);
+    return hitTexture.loadFromFile(path);
 }
 
-// добавление попадания
-void hit_view::addHit(sf::Vector2i cell)
+bool ShotView::loadMiss(const std::string& path)
+{
+    return missTexture.loadFromFile(path);
+}
+
+void ShotView::addHit(sf::Vector2i cell)
 {
     hits.push_back(cell);
 }
 
-// отрисовка огоньков
-void hit_view::draw(sf::RenderWindow& window, const BoardView& board)
+void ShotView::addMiss(sf::Vector2i cell)
 {
-    for (const auto& h : hits)
+    misses.push_back(cell);
+}
+
+void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
+{
+    // огонь
+    for (auto& h : hits)
     {
-        sf::Sprite fire;
-        fire.setTexture(texture);
+        sf::Sprite s;
+        s.setTexture(hitTexture);
+        s.setPosition(board.cellToScreen(h.x, h.y));
+        window.draw(s);
+    }
 
-        // перевод клетки в пиксели
-        sf::Vector2f pos = board.cellToScreen(h.x, h.y);
-        fire.setPosition(pos);
-
-        window.draw(fire);
+    // крестик
+    for (auto& m : misses)
+    {
+        sf::Sprite s;
+        s.setTexture(missTexture);
+        s.setPosition(board.cellToScreen(m.x, m.y));
+        window.draw(s);
     }
 }

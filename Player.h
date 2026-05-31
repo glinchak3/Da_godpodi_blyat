@@ -13,7 +13,6 @@ protected:
 public:
     Player(board& own, board& enemy) : own_board(own), enemy_board(enemy) {}
     virtual void place_ship(ship new_ship) = 0;
-    virtual cell take_turn(cell sh) = 0;
     virtual ~Player() = default; 
 };
 
@@ -25,11 +24,11 @@ public:
             own_board.place_ship(new_ship);
         }
     }
-    cell take_turn(cell sh) override {
-        if (enemy_board.can_shoot(sh)){
-            enemy_board.shoot(sh);
-        }
-    }
+   // cell take_turn(cell sh) override {
+      //  if (enemy_board.can_shoot(sh)){
+     //       enemy_board.shoot(sh);
+     //   }
+//    }
 
 };
 
@@ -46,7 +45,6 @@ private:
 public:
     ComputerPlayer(board& own, board& enemy) : Player(own, enemy) {}
     void place_ship(ship new_ship) override;
-    cell take_turn(cell sh) override;
+    cell take_turn();
 };
-
 

@@ -1,7 +1,8 @@
+#include <atomic>
+#include <thread>
 #include "Board_view.h"
 #include "Ship_controller.h"
 #include "Fier_view.h"
-
 
 #include "Board.h"
 #include "Player.h"
@@ -18,6 +19,9 @@ enum class GameState {
 class Game
 {
 private:
+
+    ShotView fier_view;
+
     sf::RenderWindow window;
     sf::Event event;
 

@@ -34,7 +34,7 @@ void ComputerPlayer::count_free_sect(int start_x, int end_x, int start_y, int en
     }
 }
 
-cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth = 0, int max_depth = 3) {
+cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth, int max_depth) {
 
     if (depth >= max_depth) {
         int count1 = 0, count2 = 0;
@@ -80,7 +80,7 @@ cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth = 0, 
     return cell(-1, -1);
 }
 
-void ComputerPlayer::place_ship(ship new_ship) override {
+void ComputerPlayer::place_ship(ship new_ship) {
     std::vector<int> fleet = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
         int board_size = 10;
 
@@ -108,7 +108,7 @@ void ComputerPlayer::place_ship(ship new_ship) override {
     }
 }
 
-cell ComputerPlayer::take_turn() override {
+cell ComputerPlayer::take_turn() {
 
     std::vector<cell> hits = find_free_cells('X'); 
         
@@ -153,4 +153,3 @@ cell ComputerPlayer::take_turn() override {
     }
     return cell(0, 0);
 }
-
