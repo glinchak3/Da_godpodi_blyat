@@ -20,9 +20,9 @@ public:
 
     void setBoard(BoardView* board);
 
-    void handle_event(const sf::Event& e, const sf::RenderWindow& window);
+    std::vector<sf::Vector2i> handle_event(const sf::Event& e, const sf::RenderWindow& window);
     void update(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 
-    ship_view& get_current_ship();
+    std::vector<sf::Vector2i>& get_current_ship();
 };
