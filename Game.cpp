@@ -87,8 +87,10 @@ void Game::handle_events()
                 player.place_ship(new_ship); // ИСПРАВЛЕНО: Обращение через указатель ->
 
                 // Проверяем автоматический переход к бою: если расставлено 10 кораблей
-                // (Вам понадобится добавить геттер количества или флаг в shipController)
-                // if (shipController.is_all_placed()) { state = GameState::PlayerTurn; }
+            
+                if (shipController.get_ON()) {
+                     state = GameState::PlayerTurn; 
+                }
             }
         }
     }
@@ -133,35 +135,35 @@ void Game::run()
         update();
 
         if (state == GameState::PlayerTurn) {
-            bool isPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-            
-            // Срабатывает один раз в момент нажатия
-            if (isPressed && !wasPressed) {
+           // Срабатывает один раз в момент нажатия
+            if (isPressed && !wasPressed){
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                 sf::Vector2f coords = window.mapPixelToCoords(mousePos);
-                
-                // Переводим пиксели экрана в координаты ячейки доски врага
+
                 sf::Vector2i targetedCell = enemyBoardView.screenToCell(coords);
-                
-                if (targetedCell.x != -1) { // Клик пришелся по игровому полю врага
+
+                if (targetedCell.x != -1){
+
                     cell shotCell(targetedCell.x, targetedCell.y);
-                    
-                    if (enemyBoard.can_shoot(shotCell)) {
-                        bool hit = enemyBoard.shoot(shotCell); // Стреляем в логике
-                        
-                        if (hit) {
-                            fier_view.addHit(shotCell); // Добавляем огонь, если попали
+
+                    if (enemyBoard.can_shoot(shotCell)){
+                        bool hit = enemyBoard.shoot(shotCell);
+                        if (hit){
+                            fier_view.addHit(shotCell);   //  огонь
+                        } else {
+                            fier_view.addMiss(shotCell);  //  крестик
                         }
 
                         if (enemyBoard.victory()) {
                             state = GameState::GameOver;
                         } else if (!hit) {
-                            state = GameState::EnemyTurn; // При промахе ход переходит машине
+                            state = GameState::EnemyTurn;
                         }
                     }
                 }
             }
-            wasPressed = isPressed; // Сохраняем состояние мыши для следующего кадра
+
+            wasPressed = isPressed;
         }
 
 
@@ -176,6 +178,8 @@ void Game::run()
             if (hit) {
                 // Если робот попал, передаем координату выстрела в систему отрисовки огня
                 fier_view.addHit(enemyShot); 
+            } else {
+                fier_view.addMiss(enemyShot);  //  крестик
             }
 
             if (playerBoard.victory()) {
