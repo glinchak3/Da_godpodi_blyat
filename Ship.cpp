@@ -10,7 +10,7 @@ ship::ship(int Size, std::vector<cell> Cells, std::vector<bool> Hit_cells) {
 ship::ship(int Size, std::vector<cell> Cells) {
     size = Size;
     cells = Cells;
-    hit_cells = std::vector<bool>(size,false);
+    hit_cells = std::vector<bool>(size,0);
 }
 
 void ship::mark_hit_cell(cell Hit_cell) {
@@ -33,13 +33,7 @@ bool ship::is_dead() {
 }
 
 std::vector<cell> ship::get_hit_cells() {
-    std::vector<cell> damaged_cells;
-    for (size_t i = 0; i < cells.size(); i++) {
-        if (hit_cells[i]) {
-            damaged_cells.push_back(cells[i]);
-        }
-    }
-    return damaged_cells;
+    return cells;
 }
 
 int ship::get_size() {

@@ -4,6 +4,8 @@
 
 #include "Board_view.h"
 #include "Ship_controller.h"
+#include "Fier_view.h"
+
 
 #include "Board.h"
 #include "Player.h"
@@ -14,9 +16,6 @@ class Game
 private:
     sf::RenderWindow window;
     sf::Event event;
-
-    float cellSize = 40.f;
-float boardSize = cellSize * 10.f;
 
     BoardView playerBoardView;
     BoardView enemyBoardView;

@@ -39,9 +39,7 @@ sf::Vector2f BoardView::cellToScreen(int x, int y) const
     float cellW = b.width / 11.f;
     float cellH = b.height / 11.f;
 
-    return {
-        b.left + x * cellW + 5.0f,
-        b.top  + y * cellH + 2.0f
+    return {b.left + x * cellW, b.top  + y * cellH
     };
 }
 
@@ -60,15 +58,4 @@ sf::Vector2i BoardView::screenToCell(sf::Vector2f pos) const
     int y = int((pos.y - b.top)  / cellH);
 
     return {x, y};
-}
-
-void BoardView::setOffset(sf::Vector2f off)
-{
-    offset = off;
-}
-
-void BoardView::setParams(sf::Vector2f origin, float size)
-{
-    boardOrigin = origin;
-    cellSize = size;
 }

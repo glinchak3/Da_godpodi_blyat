@@ -21,7 +21,8 @@ void ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& w
     // меняем активный корабль на новый при окончательном закреплении предыдущего
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y){
         if (locked){
-
+            // МЕСТО СШИВКИ
+            sf::Vector2i cell = ships[current_ship].getCell(*activeBoard);//получаем клетку для корабля
             current_ship++;
 
             if (current_ship >= (int)ships.size())

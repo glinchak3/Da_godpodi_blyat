@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Board_view.h"
 
 class ship_view {
 private:
@@ -14,5 +15,5 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Sprite& getSprite();
-    //sf::Vector2i getCell(const BoardView& board) const;
+    sf::Vector2i getCell(const BoardView& board) const;
 };
