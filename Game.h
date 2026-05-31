@@ -31,8 +31,8 @@ private:
 
     sf::Texture t4, t3, t2, t1;
 
-    HumanPlayer player;
-    ComputerPlayer enemy;
+    HumanPlayer* player;
+    ComputerPlayer* enemy;
 
     std::atomic<bool> isRunning{ true }; // Флаг работы игры для синхронизации потоков
     std::atomic<GameState> state{ GameState::Placement }; // Текущая фаза игры
