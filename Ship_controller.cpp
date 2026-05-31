@@ -11,7 +11,7 @@ void ship_controller::setBoard(BoardView* board){
 }
 
 //реагирует на ввод игрока
-void ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& window){
+cell ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& window){
 
     //переключение мышью закреплено или откреплено
     if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left){
@@ -22,7 +22,7 @@ void ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& w
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y){
         if (locked){
             // МЕСТО СШИВКИ
-            sf::Vector2i cell = ships[current_ship].getCell(*activeBoard);//получаем клетку для корабля
+            sf::Vector2i ship_cell = ships[current_ship].getCell(*activeBoard);//получаем клетку для корабля
             current_ship++;
 
             if (current_ship >= (int)ships.size())
@@ -37,6 +37,7 @@ void ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& w
         vertical = !vertical;
         ships[current_ship].setRotation(vertical);
     }
+    return cell(ship_cell.x,ship_cell.y);
 }
 
 // обновление состояний корабля
