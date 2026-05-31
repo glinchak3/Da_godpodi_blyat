@@ -57,13 +57,13 @@ void Game::init(){
 
     shipController.setBoard(&playerBoardView);
 
-    player = HumanPlayer(playerBoard, enemyBoard);
-    enemy  = ComputerPlayer(enemyBoard, playerBoard);
+    player = new HumanPlayer(playerBoard, enemyBoard);
+    enemy  = new ComputerPlayer(enemyBoard, playerBoard);
 
     fier_view.load("images/Fire.png");
 
     // Автоматическая расстановка всего флота робота на старте
-    enemy.place_ship(ship(0, {}));
+    enemy->place_ship(ship(0, {}));
 
     // ВАЖНО ДЛЯ ПОТОКОВ: Отключаем графический контекст окна в текущем (главном) потоке
     window.setActive(false); 
@@ -84,7 +84,7 @@ void Game::handle_events()
             // Если вектор координат не пустой — значит, игрок успешно зафиксировал корабль на карте
             if (!coords_list.empty()) {
                 ship new_ship(coords_list);
-                player.place_ship(new_ship); // ИСПРАВЛЕНО: Обращение через указатель ->
+                player->place_ship(new_ship); // ИСПРАВЛЕНО: Обращение через указатель ->
 
                 // Проверяем автоматический переход к бою: если расставлено 10 кораблей
             
@@ -171,7 +171,7 @@ void Game::run()
             // Искусственная пауза в полсекунды, чтобы робот не стрелял мгновенно
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-            cell enemyShot = enemy.take_turn();
+            cell enemyShot = enemy->take_turn();
             
             bool hit = playerBoard.shoot(enemyShot); // Робот стреляет по нам
             
