@@ -5,10 +5,14 @@ Game::Game()
     init();
 }
 
-//Game::~Game(){
-  // delete player;
-    //delete enemy;
-//}
+Game::~Game(){
+    isRunning = false; // Сигнал для остановки потока отрисовки
+    if (renderThread.joinable()) {
+        renderThread.join(); // Ждем завершения графического потока
+    }
+    delete player;
+    delete enemy;
+}
 
 void Game::init(){
     // создаём доски с помощью board_view
@@ -52,21 +56,28 @@ void Game::init(){
         shipController.add_ship(ship);
     }
 
-        shipController.setBoard(&playerBoardView);
+    shipController.setBoard(&playerBoardView);
 
-        //player = new Player(playerBoard, enemyBoard);
-        //enemy  = new Player(enemyBoard, playerBoard);
+    player = new HumanPlayer(playerBoard, enemyBoard);
+    enemy  = new ComputerPlayer(enemyBoard, playerBoard);
 
-        fier_view.load("images/Fire.png");
-    }
+    fier_view.load("images/Fire.png");
 
-    fier_view.addHit(cell); // СШИТЬ этой штуке нужно передать куда попало
+    // Автоматическая расстановка всего флота робота на старте
+    enemy->place_ship(ship(0, {}));
+
+    // ВАЖНО ДЛЯ ПОТОКОВ: Отключаем графический контекст окна в текущем (главном) потоке
+    window.setActive(false); 
+}
+
 
 void Game::handle_events()
 {
     while (window.pollEvent(event)){
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed){
             window.close();
+            isRunning = false;
+        }    
         shipController.handle_event(event, window);
     }
 }
@@ -88,13 +99,42 @@ void Game::render(){
     window.display();
 }
 
+void Game::render_loop() {
+    window.setActive(true); 
+    while (isRunning && window.isOpen()) {
+        render();
+    }
+} 
+
 void Game::run()
 {
+    renderThread = std::thread(&Game::render_loop, this);
     while (window.isOpen())
     {
         handle_events();
         update();
-        render();
+        if (state == GameState::EnemyTurn) {
+            // Искусственная пауза в полсекунды, чтобы робот не стрелял мгновенно
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+            cell enemyShot = enemy->take_turn();
+            
+            bool hit = playerBoard.shoot(enemyShot); // Робот стреляет по нам
+            
+            if (hit) {
+                // Если робот попал, передаем координату выстрела в систему отрисовки огня
+                fier_view.addHit(enemyShot); 
+            }
+
+            if (playerBoard.victory()) {
+                state = GameState::GameOver;
+            } else if (!hit) {
+                state = GameState::PlayerTurn; // Робот промахнулся — возвращаем ход человеку
+            }
+        }
+
+        // Небольшая разгрузка для процессора, чтобы бесконечный цикл логики не грузил ядро на 100%
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 

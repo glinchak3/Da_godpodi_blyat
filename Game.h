@@ -1,7 +1,3 @@
-#pragma once
-#include <SFML/Graphics.hpp>
-#include <vector>
-
 #include "Board_view.h"
 #include "Ship_controller.h"
 #include "Fier_view.h"
@@ -10,6 +6,14 @@
 #include "Board.h"
 #include "Player.h"
 #include "Ship.h"
+
+// Состояния игры
+enum class GameState {
+    Placement,   // Фаза расстановки кораблей игроком
+    PlayerTurn,  // Ход игрока (ожидание клика по вражескому полю)
+    EnemyTurn,   // Ход компьютера
+    GameOver     // Игра окончена
+};
 
 class Game
 {
@@ -30,15 +34,19 @@ private:
    // Player* player = nullptr;
    // Player* enemy = nullptr;
 
+    std::atomic<bool> isRunning{ true }; // Флаг работы игры для синхронизации потоков
+    std::atomic<GameState> state{ GameState::Placement }; // Текущая фаза игры
+    std::thread renderThread;           // Поток для отрисовки графики
+
     void handle_events();
     void update();
     void render();
+    void render_loop(); // Метод, который будет выполняться в отдельном потоке
 
     void init();
 
 public:
     Game();
-    //~Game();
-
+    ~Game();
     void run();
 };
