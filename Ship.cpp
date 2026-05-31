@@ -32,9 +32,16 @@ bool ship::is_dead() {
     return true;
 }
 
-std::vector<cell> ship::get_hit_cells() {
-    return cells;
+std::vector<cell> ship::get_hit_cells() const {
+    std::vector<cell> damaged_cells;
+    for (size_t i = 0; i < cells.size(); i++) {
+        if (hit_cells[i]) {
+            damaged_cells.push_back(cells[i]);
+        }
+    }
+    return damaged_cells;
 }
+
 
 int ship::get_size() {
     return size;
