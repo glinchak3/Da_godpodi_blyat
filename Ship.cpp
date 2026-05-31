@@ -13,6 +13,16 @@ ship::ship(int Size, std::vector<cell> Cells) {
     hit_cells = std::vector<bool>(size,0);
 }
 
+ship::ship(std::vector<sf::Vector2i> cs){
+    size = cs.size();
+    std::vector<cell> Cells;
+    for(int i = 0; i<size;i++){
+        Cells.push_back(cell(cs[i].x,cs[i].y));
+    }
+    cells = Cells;
+    hit_cells = std::vector<bool>(size,0);
+}
+
 void ship::mark_hit_cell(cell Hit_cell) {
 
     for (int i = 0; i < cells.size(); i++) {
