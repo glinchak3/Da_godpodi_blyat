@@ -20,7 +20,8 @@ class Game
 {
 private:
 
-    ShotView fier_view;
+    ShotView playerShots;
+    ShotView enemyShots;
 
     sf::RenderWindow window;
     sf::Event event;

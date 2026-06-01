@@ -63,11 +63,15 @@ void Game::init(){
     player = new HumanPlayer(playerBoard, enemyBoard);
     enemy  = new ComputerPlayer(enemyBoard, playerBoard);
 
-    fier_view.loadHit("images/Fier.png");
-    fier_view.loadMiss("images/Miss.png");
+    playerShots.loadHit("images/Fier.png");
+    playerShots.loadMiss("images/Miss.png");
+    enemyShots.loadHit("images/Fier.png");
+    enemyShots.loadMiss("images/Miss.png");
 
-    fier_view.setHitScale(0.05f); 
-    fier_view.setMissScale(0.03f);
+    playerShots.setHitScale(0.05f);
+    playerShots.setMissScale(0.03f);
+    enemyShots.setHitScale(0.05f);
+    enemyShots.setMissScale(0.03f);
 
     // Автоматическая расстановка всего флота робота на старте
     enemy->place_ship(ship(0, {}));
@@ -118,8 +122,8 @@ void Game::render(){
 
     shipController.draw(window);
 
-    fier_view.draw(window, playerBoardView);
-    fier_view.draw(window, enemyBoardView);
+    playerShots.draw(window, playerBoardView);
+    enemyShots.draw(window, enemyBoardView);
 
     window.display();
 }
@@ -150,9 +154,9 @@ void Game::run()
                 if (enemyBoard.can_shoot(shotCell)){
                     bool hit = enemyBoard.shoot(shotCell);
                     if (hit){
-                        fier_view.addHit(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                        enemyShots.addHit(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
                     } else {
-                        fier_view.addMiss(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                        enemyShots.addMiss(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
                     }
                     
                     if (enemyBoard.victory()) {
@@ -173,9 +177,9 @@ void Game::run()
             
             if (hit) {
                 // Если робот попал, передаем координату выстрела в систему отрисовки огня
-                fier_view.addHit(enemyShot.to_sf()); 
+                playerShots.addHit(enemyShot.to_sf());
             } else {
-                fier_view.addMiss(enemyShot.to_sf());  //  крестик
+                playerShots.addMiss(enemyShot.to_sf());  //  крестик
             }
 
             if (playerBoard.victory()) {
