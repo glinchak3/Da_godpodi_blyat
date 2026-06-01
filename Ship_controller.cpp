@@ -18,9 +18,7 @@ std::vector<sf::Vector2i> ship_controller::handle_event(
     const sf::Event& e,
     const sf::RenderWindow& window)
 {
-    int flag = 0;
-
-    std::vector<sf::Vector2i> ship; // <-- здесь
+    std::vector<sf::Vector2i> ship;
 
     if (e.type == sf::Event::MouseButtonPressed &&
         e.mouseButton.button == sf::Mouse::Left)
@@ -33,31 +31,37 @@ std::vector<sf::Vector2i> ship_controller::handle_event(
     {
         if (locked)
         {
-            flag++;
+            // Получаем клетки текущего корабля
             ship = ships[current_ship].get_ship_cells(*activeBoard);
 
+            // Переходим к следующему кораблю
             current_ship++;
 
-            if (current_ship >= (int)ships.size())
-                current_ship = ships.size() - 1;
-
-            locked = false;
+            // Проверяем, был ли это последний корабль
+            if (current_ship == ships.size())
+            {
+                ON = true;      // Все корабли расставлены
+                locked = true;  // Заблокировать последний корабль на месте
+            }
+            else
+            {
+                locked = false; // Разблокируем следующий корабль
+            }
         }
     }
 
     if (e.type == sf::Event::KeyPressed &&
         e.key.code == sf::Keyboard::R)
     {
-        vertical = !vertical;
-        ships[current_ship].setRotation(vertical);
+        if (current_ship < ships.size())  // Защита от выхода за границы
+        {
+            vertical = !vertical;
+            ships[current_ship].setRotation(vertical);
+        }
     }
-
-    if (flag == 9)
-        ON = true;
 
     return ship;
 }
-
 // обновление состояний корабля
 void ship_controller::update(const sf::RenderWindow& window){
 

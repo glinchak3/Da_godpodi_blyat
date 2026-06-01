@@ -66,6 +66,9 @@ void Game::init(){
     fier_view.loadHit("images/Fier.png");
     fier_view.loadMiss("images/Miss.png");
 
+    fier_view.setHitScale(0.05f); 
+    fier_view.setMissScale(0.03f);
+
     // Автоматическая расстановка всего флота робота на старте
     enemy->place_ship(ship(0, {}));
 
@@ -121,68 +124,46 @@ void Game::render(){
     window.display();
 }
 
-void Game::render_loop() {
-    window.setActive(true); 
-    while (isRunning && window.isOpen()) {
-        render();
-    }
-} 
 
 void Game::run()
 {
-    renderThread = std::thread(&Game::render_loop, this);
+    window.setActive(false);
+
     bool wasPressed = false;
 
     while (window.isOpen()&& isRunning)
     {
         handle_events();
         update();
-
-        if (state == GameState::PlayerTurn) {
-           // Срабатывает один раз в момент нажатия
-            bool isPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-            if (isPressed && !wasPressed){
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                sf::Vector2f coords = window.mapPixelToCoords(mousePos);
-
-                sf::Vector2i targetedCell = enemyBoardView.screenToCell(coords);
-
-                if (targetedCell.x != -1){
-
-                    cell shotCell(targetedCell.x, targetedCell.y);
-
-                    if (enemyBoard.can_shoot(shotCell)){
-                        bool hit = enemyBoard.shoot(shotCell);
-                        if (hit){
-                            fier_view.addHit(
-                                sf::Vector2i(
-                                    shotCell.get_x(),
-                                    shotCell.get_y()
-                                )
-                            );   //  огонь
-                        } else {
-                            fier_view.addMiss(
-                                sf::Vector2i(
-                                    shotCell.get_x(),
-                                    shotCell.get_y()
-                                )
-                            );  //  крестик
-                        }
-
-                        if (enemyBoard.victory()) {
-                            state = GameState::GameOver;
-                        } else if (!hit) {
-                            state = GameState::EnemyTurn;
-                        }
+        render();
+        if (state == GameState::PlayerTurn && 
+            event.type == sf::Event::MouseButtonPressed &&
+            event.mouseButton.button == sf::Mouse::Left)
+        {
+            // Обработка выстрела здесь
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            sf::Vector2f coords = window.mapPixelToCoords(mousePos);
+            sf::Vector2i targetedCell = enemyBoardView.screenToCell(coords);
+            
+            if (targetedCell.x != -1){
+                cell shotCell(targetedCell.x, targetedCell.y);
+                if (enemyBoard.can_shoot(shotCell)){
+                    bool hit = enemyBoard.shoot(shotCell);
+                    if (hit){
+                        fier_view.addHit(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                    } else {
+                        fier_view.addMiss(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                    }
+                    
+                    if (enemyBoard.victory()) {
+                        state = GameState::GameOver;
+                    } else if (!hit) {
+                        state = GameState::EnemyTurn;
                     }
                 }
             }
-
-            wasPressed = isPressed;
-        }
-
-
-        if (state == GameState::EnemyTurn) {
+        
+        } else if (state == GameState::EnemyTurn) {
             // Искусственная пауза в полсекунды, чтобы робот не стрелял мгновенно
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
 

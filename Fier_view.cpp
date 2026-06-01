@@ -27,6 +27,7 @@ void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
     {
         sf::Sprite s;
         s.setTexture(hitTexture);
+        s.setScale(hitScale, hitScale);
         s.setPosition(board.cellToScreen(h.x, h.y));
         window.draw(s);
     }
@@ -36,7 +37,16 @@ void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
     {
         sf::Sprite s;
         s.setTexture(missTexture);
+        s.setScale(missScale, missScale);
         s.setPosition(board.cellToScreen(m.x, m.y));
         window.draw(s);
     }
+}
+
+void ShotView::setHitScale(float scale) {
+    hitScale = scale;
+}
+
+void ShotView::setMissScale(float scale) {
+    missScale = scale;
 }
