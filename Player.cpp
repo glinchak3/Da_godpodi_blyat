@@ -34,23 +34,11 @@ void ComputerPlayer::count_free_sect(int start_x, int end_x, int start_y, int en
     }
 }
 
-cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth, int max_depth) {
-
-    if (depth >= max_depth) {
-        int count1 = 0, count2 = 0;
-        count_free_sect(x1, x2, y1, y2, count1);
-        // В зависимости от результатов, выбрать сторону
-        if (count1 > 0) {
-            return cell(x1, y1); // или другая логика
-        } else {
-            return cell(-1, -1);
-        }
-    }
-    
+cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2) {
     if (x1 == x2 && y1 == y2) {
         return enemy_board.can_shoot(cell(x1, y1)) ? cell(x1, y1) : cell(-1, -1);
     } 
-        
+    
     int mid_x1 = x2;
     int start_x2 = x1;
     int mid_y1 = y2;
@@ -65,18 +53,39 @@ cell ComputerPlayer::find_sector(int x1, int x2, int y1, int y2, int depth, int 
     }
 
     int count1 = 0, count2 = 0;
-        
+    
     std::thread t1(&ComputerPlayer::count_free_sect, this, x1, mid_x1, y1, mid_y1, std::ref(count1));
     std::thread t2(&ComputerPlayer::count_free_sect, this, start_x2, x2, start_y2, y2, std::ref(count2));
-        
+    
     t1.join(); 
     t2.join(); 
 
-    if ((count1 >= count2) && (count1 > 0)) {
-        return find_sector(x1, mid_x1, y1, mid_y1, depth + 1, max_depth);
-    } else if (count2 > 0) {
-        return find_sector(start_x2, x2, start_y2, y2, depth + 1, max_depth);
+    // ИСПРАВЛЕНО: Если в обоих секторах есть доступные клетки
+    if (count1 > 0 && count2 > 0) {
+        if (count1 > count2) {
+            return find_sector(x1, mid_x1, y1, mid_y1);
+        } else if (count2 > count1) {
+            return find_sector(start_x2, x2, start_y2, y2);
+        } else {
+            // ЕСЛИ КЛЕТОК ПОРОВНУ: Случайно выбираем, в какой сектор пойти углубляться.
+            // Это уберет зацикливание ИИ на одной и той же недоступной клетке!
+            if (std::rand() % 2 == 0) {
+                cell res = find_sector(x1, mid_x1, y1, mid_y1);
+                if (res.get_x() != -1) return res;
+                return find_sector(start_x2, x2, start_y2, y2);
+            } else {
+                cell res = find_sector(start_x2, x2, start_y2, y2);
+                if (res.get_x() != -1) return res;
+                return find_sector(x1, mid_x1, y1, mid_y1);
+            }
+        }
     }
+    
+    // Если клетки остались только в первой половине
+    if (count1 > 0) return find_sector(x1, mid_x1, y1, mid_y1);
+    // If клетки остались только во второй половине
+    if (count2 > 0) return find_sector(start_x2, x2, start_y2, y2);
+
     return cell(-1, -1);
 }
 
@@ -143,13 +152,15 @@ cell ComputerPlayer::take_turn() {
     }
 
     // Запасной вариант: стреляем в первую попавшуюся доступную клетку
-    for (int r = 0; r < 10; ++r) {
-        for (int c = 0; c < 10; ++c) {
-            cell fallback_cell(r, c);
-            if (enemy_board.can_shoot(fallback_cell)) {
-                return fallback_cell;
-            }
+        // Запасной вариант в самом конце take_turn(): ищем случайную пустую клетку вместо монотонного перебора
+    while (true) {
+        int r = std::rand() % 10;
+        int c = std::rand() % 10;
+        cell fallback_cell(r, c);
+        if (enemy_board.can_shoot(fallback_cell)) {
+            return fallback_cell;
         }
     }
+
     return cell(0, 0);
 }
