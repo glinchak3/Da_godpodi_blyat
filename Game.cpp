@@ -10,14 +10,12 @@ Game::Game()
 
 Game::~Game(){
     is_running = false;
-    if (renderThread.joinable()) {
-        renderThread.join();
-    }
+    delete player;
+    delete enemy;
 }
 
 void Game::init(){
     std::srand(std::time(nullptr));
-
 
     // создаём доски с помощью board_view
     playerBoardView.load("images/Field_1.png", {0.f, 0.f}, (sf::Vector2f)window.getSize());
@@ -67,7 +65,7 @@ void Game::init(){
     lose_sprite.setTexture(lose_texture);
 
     win_sprite.setPosition(100.f, 100.f);
-    lose_sprite.setPosition(100.f, 100.f);
+    lose_sprite.setPosition(100.f, 50.f);
 
     shipController.set_board(&playerBoardView);
     shipController.set_game_board(&player_board);
@@ -85,26 +83,26 @@ void Game::init(){
     enemy_shots.set_hit_scale(0.05f);
     enemy_shots.set_miss_scale(0.03f);
 
-    // Автоматическая расстановка всего флота робота на старте
+    //расстановка флота робота
     enemy->place_ship(ship(0, {}));
 
-    window.setActive(false); 
 }
 
 void Game::handle_events(){
-    while (window.pollEvent(event)){
+    while (window.pollEvent(event)){ //берём все события
         if (event.type == sf::Event::Closed) {
             window.close();
             is_running = false;
         }
 
         if (state == game_state::placement) {
+            // событие передаётся контроллеру
             std::vector<sf::Vector2i> coords_list = shipController.handle_event(event, window);
-            
+            // расставляем корабли
             if (!coords_list.empty()) {
                 ship new_ship(coords_list);
                 player->place_ship(new_ship);
-                
+                // к бою
                 if (shipController.get_ON()) {
                     state = game_state::player_turn;
                 }
@@ -141,16 +139,13 @@ void Game::render(){
 }
 
 void Game::run(){
-    window.setActive(false);
 
-    while (window.isOpen() && is_running){
+    while (window.isOpen() && is_running){ // пока окно не закрыто и игра не остановлена
         handle_events();
         update();
         render();
         
-        if (state == game_state::player_turn && 
-            event.type == sf::Event::MouseButtonPressed &&
-            event.mouseButton.button == sf::Mouse::Left){
+        if (state == game_state::player_turn && event.type == sf::Event::MouseButtonPressed &event.mouseButton.button == sf::Mouse::Left){
             
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             sf::Vector2f coords = window.mapPixelToCoords(mousePos);
@@ -174,12 +169,9 @@ void Game::run(){
                     }
                 }
             }
-        } 
-        else if (state == game_state::enemy_turn) {
+        } else if (state == game_state::enemy_turn) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
             cell enemyShot = enemy->take_turn();
-            
             bool hit = player_board.shoot(enemyShot);
             
             if (hit) {
@@ -195,7 +187,5 @@ void Game::run(){
                 state = game_state::player_turn;
             }
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

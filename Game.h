@@ -18,8 +18,8 @@ enum class game_state {
 
 class Game {
 private:
-    ShotView player_shots;  // shot_view → ShotView
-    ShotView enemy_shots;   // shot_view → ShotView
+    ShotView player_shots;
+    ShotView enemy_shots;
 
     sf::RenderWindow window;
     sf::Event event;
@@ -39,16 +39,14 @@ private:
     HumanPlayer* player;
     ComputerPlayer* enemy;
 
-    std::atomic<bool> is_running{ true };
-    std::atomic<game_state> state{ game_state::placement };  // GameState → game_state
+    bool is_running = true;
+    game_state state = game_state::placement;
     bool player_won = false;
 
-    void handle_events();
-    void update();
-    void render();
-    void init();
-
-    std::thread renderThread; 
+    void init(); // инициализация
+    void handle_events(); //обработка событий
+    void update(); // обновление состояний
+    void render(); // визуализация
 
 public:
     Game();
