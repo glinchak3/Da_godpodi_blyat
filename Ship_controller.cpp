@@ -18,49 +18,55 @@ std::vector<sf::Vector2i> ship_controller::handle_event(
     const sf::Event& e,
     const sf::RenderWindow& window)
 {
-    std::vector<sf::Vector2i> ship;
-
+    // Левый клик - захват/отпускание корабля
     if (e.type == sf::Event::MouseButtonPressed &&
         e.mouseButton.button == sf::Mouse::Left)
     {
         locked = !locked;
+        return {};
     }
 
-    if (e.type == sf::Event::KeyPressed &&
-        e.key.code == sf::Keyboard::Y)
+    
+
+    // Клавиша Y - фиксация корабля
+    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y)
     {
-        if (locked)
+        if (locked && current_ship < ships.size())
         {
             // Получаем клетки текущего корабля
-            ship = ships[current_ship].get_ship_cells(*activeBoard);
-
-            // Переходим к следующему кораблю
-            current_ship++;
-
-            // Проверяем, был ли это последний корабль
-            if (current_ship == ships.size())
+            std::vector<sf::Vector2i> shipCells = ships[current_ship].get_ship_cells(*activeBoard);
+            
+            // Создаем временный корабль для проверки
+            std::vector<cell> cells;
+            for (const auto& pos : shipCells) {
+                cells.push_back(cell(pos.x, pos.y));
+            }
+            ship tempShip(shipCells.size(), cells);
+            
+            // Проверяем, можно ли поставить
+            if (gameBoard && gameBoard->can_place_ship(tempShip))
             {
-                ON = true;      // Все корабли расставлены
-                locked = true;  // Заблокировать последний корабль на месте
+                // Можно - фиксируем и переходим к следующему кораблю
+                current_ship++;
+                if (current_ship == ships.size()) {
+                    ON = true;      // Все корабли расставлены
+                    locked = true;
+                } else {
+                    locked = false;  // Разблокируем следующий корабль
+                }
+                return shipCells;    // Возвращаем клетки для размещения на доске
             }
             else
             {
-                locked = false; // Разблокируем следующий корабль
+                // Нельзя поставить - сбрасываем locked, чтобы можно было двигать дальше
+                locked = false;
+                return {};           // Возвращаем пустой вектор - фиксация не удалась
             }
         }
+        return {};
     }
 
-    if (e.type == sf::Event::KeyPressed &&
-        e.key.code == sf::Keyboard::R)
-    {
-        if (current_ship < ships.size())  // Защита от выхода за границы
-        {
-            vertical = !vertical;
-            ships[current_ship].setRotation(vertical);
-        }
-    }
-
-    return ship;
+    return {};
 }
 // обновление состояний корабля
 void ship_controller::update(const sf::RenderWindow& window){

@@ -26,10 +26,6 @@ void ship_view::setPosition(sf::Vector2f pos){
     sprite.setPosition(pos);
 }
 
-void ship_view::setRotation(bool v){
-    vertical = v;
-    sprite.setRotation(vertical ? 90.f : 0.f);
-}
 
 //отрисовывает корабль (один!)
 void ship_view::draw(sf::RenderWindow& window){
@@ -48,10 +44,8 @@ std::vector<sf::Vector2i> ship_view::get_ship_cells(const BoardView& board) cons
     sf::Vector2i start = board.screenToCell(sprite.getPosition());
 
     for (int i = 0; i < length; i++){
-        if (vertical)
-            cells.push_back({start.x, start.y + i});
-        else
-            cells.push_back({start.x + i, start.y});
+        // ТОЛЬКО ГОРИЗОНТАЛЬНО (по оси X)
+        cells.push_back({start.x + i, start.y});
     }
     return cells;
 }

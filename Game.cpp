@@ -59,6 +59,7 @@ void Game::init(){
     }
 
     shipController.setBoard(&playerBoardView);
+    shipController.setGameBoard(&playerBoard);
 
     player = new HumanPlayer(playerBoard, enemyBoard);
     enemy  = new ComputerPlayer(enemyBoard, playerBoard);
@@ -92,15 +93,13 @@ void Game::handle_events()
         if (state == GameState::Placement) {
             std::vector<sf::Vector2i> coords_list = shipController.handle_event(event, window);
             
-            // Если вектор координат не пустой — значит, игрок успешно зафиксировал корабль на карте
+            // Если вектор координат не пустой — значит, игрок успешно зафиксировал корабль
             if (!coords_list.empty()) {
                 ship new_ship(coords_list);
-                player->place_ship(new_ship); ; // ИСПРАВЛЕНО: Обращение через указатель ->
-
-                // Проверяем автоматический переход к бою: если расставлено 10 кораблей
-            
+                player->place_ship(new_ship);  // Теперь проверка уже пройдена в контроллере
+                
                 if (shipController.get_ON()) {
-                     state = GameState::PlayerTurn; 
+                    state = GameState::PlayerTurn;
                 }
             }
         }
@@ -113,6 +112,8 @@ void Game::update(){
         shipController.update(window);
     }
 }
+
+
 
 void Game::render(){
     window.clear();

@@ -4,6 +4,7 @@
 #include <vector>
 #include "Ship_view.h"
 #include "Board_view.h"
+#include "Board.h"
 
 class ship_controller {
 private:
@@ -11,12 +12,14 @@ private:
 
     int current_ship = 0;
     bool locked = false;
-    bool vertical = false;
 
     BoardView* activeBoard = nullptr;
     bool ON = false;
+    board* gameBoard = nullptr;
 
 public:
+    
+    void setGameBoard(board* board) { gameBoard = board; }
     bool get_ON();
 
     void add_ship(const ship_view& ship);

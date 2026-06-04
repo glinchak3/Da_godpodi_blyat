@@ -22,13 +22,19 @@ void ShotView::addMiss(sf::Vector2i cell)
 
 void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
 {
+    // Получаем размеры клетки
+    sf::FloatRect bounds = board.get_bounds();
+    float cellW = bounds.width / 11.f;
+    float cellH = bounds.height / 11.f;
+    
     // огонь
     for (auto& h : hits)
     {
         sf::Sprite s;
         s.setTexture(hitTexture);
         s.setScale(hitScale, hitScale);
-        s.setPosition(board.cellToScreen(h.x, h.y));
+        sf::Vector2f cellPos = board.cellToScreen(h.x, h.y);
+        s.setPosition(cellPos.x + 4.f, cellPos.y +  2.f);
         window.draw(s);
     }
 
@@ -38,7 +44,8 @@ void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
         sf::Sprite s;
         s.setTexture(missTexture);
         s.setScale(missScale, missScale);
-        s.setPosition(board.cellToScreen(m.x, m.y));
+        sf::Vector2f cellPos = board.cellToScreen(m.x, m.y);
+        s.setPosition(cellPos.x +  1.f, cellPos.y +  1.f);
         window.draw(s);
     }
 }

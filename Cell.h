@@ -14,6 +14,7 @@ class cell{
         int y;
 
     public:
+        cell():x(0),y(0){}
         cell(int x, int y): x(x), y(y){}
         int get_x() const{
             return x;
