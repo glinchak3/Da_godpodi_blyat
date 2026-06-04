@@ -11,24 +11,27 @@ private:
     std::vector<ship_view> ships;
 
     int current_ship = 0;
-    bool locked = false;
+    bool locked = false; //зафиксирован ли корабль на поле
 
-    BoardView* activeBoard = nullptr;
-    bool ON = false;
-    board* gameBoard = nullptr;
+    board_view* active_board = nullptr; // указатель графическую доску
+    board* game_board = nullptr; // указатель на логическую доску
+    bool ON = false; // флаг окончания расстановки кораблей
 
 public:
+    //устанавливает указатель на логическую доску
+    void set_game_board(board* board);
     
-    void setGameBoard(board* board) { gameBoard = board; }
+    //устанавливает указатель на логическую доску
+    void set_board(board_view* board);
+
     bool get_ON();
 
     void add_ship(const ship_view& ship);
-    void setBoard(BoardView* board);
 
-    std::vector<sf::Vector2i> handle_event(
-        const sf::Event& e,
-        const sf::RenderWindow& window);
+   // обрабатывает ввод пользователя
+    std::vector<sf::Vector2i> handle_event(const sf::Event& e, const sf::RenderWindow& window);
 
+    // обновляет позицию текущего корабля
     void update(const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 

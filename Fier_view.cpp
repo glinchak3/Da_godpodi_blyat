@@ -1,59 +1,49 @@
 #include "Fier_view.h"
 
-bool ShotView::loadHit(const std::string& path)
-{
-    return hitTexture.loadFromFile(path);
+bool ShotView::load_hit(const std::string& path){
+    return hit_texture.loadFromFile(path);  // hitTexture → hit_texture
 }
 
-bool ShotView::loadMiss(const std::string& path)
-{
-    return missTexture.loadFromFile(path);
+bool ShotView::load_miss(const std::string& path){
+    return miss_texture.loadFromFile(path);  // missTexture → miss_texture
 }
 
-void ShotView::addHit(sf::Vector2i cell)
-{
+void ShotView::add_hit(sf::Vector2i cell){
     hits.push_back(cell);
 }
 
-void ShotView::addMiss(sf::Vector2i cell)
-{
+void ShotView::add_miss(sf::Vector2i cell){
     misses.push_back(cell);
 }
 
-void ShotView::draw(sf::RenderWindow& window, const BoardView& board)
-{
-    // Получаем размеры клетки
+void ShotView::draw(sf::RenderWindow& window, const board_view& board){  // BoardView → board_view
     sf::FloatRect bounds = board.get_bounds();
     float cellW = bounds.width / 11.f;
     float cellH = bounds.height / 11.f;
     
-    // огонь
-    for (auto& h : hits)
-    {
+    for (auto& h : hits){
         sf::Sprite s;
-        s.setTexture(hitTexture);
-        s.setScale(hitScale, hitScale);
-        sf::Vector2f cellPos = board.cellToScreen(h.x, h.y);
-        s.setPosition(cellPos.x + 4.f, cellPos.y +  2.f);
+        s.setTexture(hit_texture);  // hitTexture → hit_texture
+        s.setScale(hit_scale, hit_scale);
+        sf::Vector2f cell_pos = board.cell_to_screen(h.x, h.y);
+        s.setPosition(cell_pos.x + 4.f, cell_pos.y + 2.f);
         window.draw(s);
     }
 
-    // крестик
-    for (auto& m : misses)
-    {
+    for (auto& m : misses){
         sf::Sprite s;
-        s.setTexture(missTexture);
-        s.setScale(missScale, missScale);
-        sf::Vector2f cellPos = board.cellToScreen(m.x, m.y);
-        s.setPosition(cellPos.x +  1.f, cellPos.y +  1.f);
+        s.setTexture(miss_texture);  // missTexture → miss_texture
+        s.setScale(miss_scale, miss_scale);
+        sf::Vector2f cell_pos = board.cell_to_screen(m.x, m.y);
+        s.setPosition(cell_pos.x + 1.f, cell_pos.y + 1.f);
         window.draw(s);
     }
 }
 
-void ShotView::setHitScale(float scale) {
-    hitScale = scale;
+void ShotView::set_hit_scale(float scale) {
+    hit_scale = scale;
 }
 
-void ShotView::setMissScale(float scale) {
-    missScale = scale;
+void ShotView::set_miss_scale(float scale) {  
+    miss_scale = scale;
 }

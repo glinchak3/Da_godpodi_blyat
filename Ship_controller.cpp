@@ -4,63 +4,59 @@ bool ship_controller::get_ON(){
     return ON;
 }
 
-//добавление корабыль в список визуальных кораблей
+//добавление корабля в список визуальных кораблей
 void ship_controller::add_ship(const ship_view& ship){ 
     ships.push_back(ship);
 }
 
-// задаём о какой доске мы сейчас говорим
-void ship_controller::setBoard(BoardView* board){
-    activeBoard = board;
+//устанавливает указатель на логическую доску
+void ship_controller::set_board(board_view* board){
+    active_board = board;
 }
 
-std::vector<sf::Vector2i> ship_controller::handle_event(
-    const sf::Event& e,
-    const sf::RenderWindow& window)
-{
+void ship_controller::set_game_board(board* board){
+    game_board = board; 
+}
+
+std::vector<sf::Vector2i> ship_controller::handle_event(const sf::Event& e, const sf::RenderWindow& window){
     // Левый клик - захват/отпускание корабля
-    if (e.type == sf::Event::MouseButtonPressed &&
-        e.mouseButton.button == sf::Mouse::Left)
-    {
+    if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left){
         locked = !locked;
         return {};
     }
 
-    
-
     // Клавиша Y - фиксация корабля
-    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y)
-    {
+    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Y){
         if (locked && current_ship < ships.size())
         {
             // Получаем клетки текущего корабля
-            std::vector<sf::Vector2i> shipCells = ships[current_ship].get_ship_cells(*activeBoard);
+            std::vector<sf::Vector2i> shipCells = ships[current_ship].get_ship_cells(*active_board);
             
             // Создаем временный корабль для проверки
             std::vector<cell> cells;
             for (const auto& pos : shipCells) {
                 cells.push_back(cell(pos.x, pos.y));
             }
-            ship tempShip(shipCells.size(), cells);
+
+            ship temp_ship(shipCells.size(), cells);
             
             // Проверяем, можно ли поставить
-            if (gameBoard && gameBoard->can_place_ship(tempShip))
-            {
+            if (game_board && game_board->can_place_ship(temp_ship)){
                 // Можно - фиксируем и переходим к следующему кораблю
                 current_ship++;
                 if (current_ship == ships.size()) {
-                    ON = true;      // Все корабли расставлены
+                    ON = true;
                     locked = true;
-                } else {
-                    locked = false;  // Разблокируем следующий корабль
                 }
-                return shipCells;    // Возвращаем клетки для размещения на доске
+                else {
+                    locked = false;
+                }
+                return shipCells;
             }
             else
             {
-                // Нельзя поставить - сбрасываем locked, чтобы можно было двигать дальше
                 locked = false;
-                return {};           // Возвращаем пустой вектор - фиксация не удалась
+                return {};  
             }
         }
         return {};
@@ -68,25 +64,22 @@ std::vector<sf::Vector2i> ship_controller::handle_event(
 
     return {};
 }
+
 // обновление состояний корабля
 void ship_controller::update(const sf::RenderWindow& window){
 
-    // если не зафиксилован то можно двигать
     if (!locked){ 
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        sf::Vector2f pos = window.mapPixelToCoords(mousePos);
 
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window); // пиксели мыши
-        sf::Vector2f pos = window.mapPixelToCoords(mousePos);   // world coords
-
-        if (activeBoard){ 
-
-            sf::Vector2i cell = activeBoard->screenToCell(pos);
-
+        if (active_board){ 
+            sf::Vector2i cell = active_board->screen_to_cell(pos);
             if (cell.x != -1){ 
-                pos = activeBoard->cellToScreen(cell.x, cell.y);
+                pos = active_board->cell_to_screen(cell.x, cell.y);
             }
         }
 
-        ships[current_ship].setPosition(pos);
+        ships[current_ship].set_position(pos);
     }
 }
 
@@ -98,3 +91,4 @@ void ship_controller::draw(sf::RenderWindow& window){
 ship_view& ship_controller::get_current_ship(){
     return ships[current_ship];
 }
+

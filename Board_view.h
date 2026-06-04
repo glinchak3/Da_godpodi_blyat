@@ -2,19 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 
-class BoardView {
+class board_view {
 private:
     sf::Texture texture;
     sf::Sprite sprite;
-    sf::FloatRect bounds;
+    sf::FloatRect bounds; //границы спрайта
 
-    sf::Vector2f boardOrigin;
-float cellSize;
-    
-    sf::Vector2f offset{0.f, 0.f};
-    void setOffset(sf::Vector2f off);
-
-    sf::Vector2f gridOffset{ -2.f, 1.f };
+    sf::Vector2f board_origin;
 
 public:
     bool load(const std::string& path, sf::Vector2f pos, sf::Vector2f windowSize);
@@ -22,10 +16,8 @@ public:
 
     sf::FloatRect get_bounds() const;
 
-    sf::Vector2f cellToScreen(int x, int y) const;
-    sf::Vector2i screenToCell(sf::Vector2f pos) const;
-
-    void setParams(sf::Vector2f origin, float cellSize);
+    sf::Vector2f cell_to_screen(int x, int y) const;
+    sf::Vector2i screen_to_cell(sf::Vector2f pos) const;
 
    
 };

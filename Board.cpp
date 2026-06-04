@@ -1,4 +1,6 @@
 #include "Board.h"
+#include "Cell.h"
+#include <vector>
 
 board::board() {
     grid = std::vector<std::vector<char>>(10, std::vector<char>(10, '.'));
@@ -46,12 +48,12 @@ bool board::victory() const {
         for (int x = 0; x < grid[y].size(); x++) {
 
             if (grid[y][x] == 'S') {
-                return 0;
+                return false;
             }
         }
     }
 
-    return 1;
+    return true;
 }
 
 bool board::can_place_ship(ship ship) const {
@@ -60,10 +62,12 @@ bool board::can_place_ship(ship ship) const {
         int curr_x = cell.get_x(); 
         int curr_y = cell.get_y();
 
+        //проверка что не выходит за границы доски
         if ((curr_x < 0) || (curr_x >= 10) || (curr_y < 0) || (curr_y >= 10)) {
             return false;
         }
 
+        //проверка соседних клеток на правило расстановки
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 int check_x = curr_x + dx;

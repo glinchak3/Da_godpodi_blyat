@@ -1,7 +1,7 @@
 #include "Board_view.h"
 
 //загрузка и настройка изображения
-bool BoardView::load(const std::string& path, sf::Vector2f pos, sf::Vector2f windowSize){
+bool board_view::load(const std::string& path, sf::Vector2f pos, sf::Vector2f windowSize){
     sf::Image img;
     if (!img.loadFromFile(path))
         return false;
@@ -22,18 +22,17 @@ bool BoardView::load(const std::string& path, sf::Vector2f pos, sf::Vector2f win
 }
 
 //отрисовка картинки
-void BoardView::draw(sf::RenderWindow& window){
+void board_view::draw(sf::RenderWindow& window){
     window.draw(sprite);
 }
 
 //получение границ картинки
-sf::FloatRect BoardView::get_bounds() const{
+sf::FloatRect board_view::get_bounds() const{
     return bounds;
 }
 
 //перевод сетки из координат в сетку из пикселей 
-sf::Vector2f BoardView::cellToScreen(int x, int y) const
-{
+sf::Vector2f board_view::cell_to_screen(int x, int y) const{
     sf::FloatRect b = sprite.getGlobalBounds();
 
     float cellW = b.width / 11.f;
@@ -43,8 +42,8 @@ sf::Vector2f BoardView::cellToScreen(int x, int y) const
     };
 }
 
-//перевод сетки из пикселей в сетку из координат
-sf::Vector2i BoardView::screenToCell(sf::Vector2f pos) const
+//перевод сетки из пикселей в се_тку из координат
+sf::Vector2i board_view::screen_to_cell(sf::Vector2f pos) const
 {
     sf::FloatRect b = sprite.getGlobalBounds();
 

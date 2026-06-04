@@ -1,6 +1,5 @@
 #include <atomic>
 #include <thread>
-
 #include "Game.h"
 #include <chrono>
 
@@ -10,13 +9,16 @@ Game::Game()
 }
 
 Game::~Game(){
-    isRunning = false; // Сигнал для остановки потока отрисовки
+    is_running = false;
     if (renderThread.joinable()) {
-        renderThread.join(); // Ждем завершения графического потока
+        renderThread.join();
     }
 }
 
 void Game::init(){
+    std::srand(std::time(nullptr));
+
+
     // создаём доски с помощью board_view
     playerBoardView.load("images/Field_1.png", {0.f, 0.f}, (sf::Vector2f)window.getSize());
     enemyBoardView.load("images/Field_2.png", {425.f, 0.f}, (sf::Vector2f)window.getSize());
@@ -30,7 +32,7 @@ void Game::init(){
     // 1 четырёхпалубник
     {
         ship_view ship(4);
-        ship.setTexture(t4, 0.108f);
+        ship.set_texture(t4, 0.108f);
         shipController.add_ship(ship);
     }
 
@@ -38,7 +40,7 @@ void Game::init(){
     for (int i = 0; i < 2; i++)
     {
         ship_view ship(3);
-        ship.setTexture(t3, 0.08f);
+        ship.set_texture(t3, 0.08f);
         shipController.add_ship(ship);
     }
 
@@ -46,7 +48,7 @@ void Game::init(){
     for (int i = 0; i < 3; i++)
     {
         ship_view ship(2);
-        ship.setTexture(t2, 0.08f);
+        ship.set_texture(t2, 0.08f);
         shipController.add_ship(ship);
     }
 
@@ -54,52 +56,57 @@ void Game::init(){
     for (int i = 0; i < 4; i++)
     {
         ship_view ship(1);
-        ship.setTexture(t1, 0.08f);
+        ship.set_texture(t1, 0.08f);
         shipController.add_ship(ship);
     }
 
-    shipController.setBoard(&playerBoardView);
-    shipController.setGameBoard(&playerBoard);
+    win_texture.loadFromFile("images/win.png");
+    lose_texture.loadFromFile("images/lose.png");
+    
+    win_sprite.setTexture(win_texture);
+    lose_sprite.setTexture(lose_texture);
 
-    player = new HumanPlayer(playerBoard, enemyBoard);
-    enemy  = new ComputerPlayer(enemyBoard, playerBoard);
+    win_sprite.setPosition(100.f, 100.f);
+    lose_sprite.setPosition(100.f, 100.f);
 
-    playerShots.loadHit("images/Fier.png");
-    playerShots.loadMiss("images/Miss.png");
-    enemyShots.loadHit("images/Fier.png");
-    enemyShots.loadMiss("images/Miss.png");
+    shipController.set_board(&playerBoardView);
+    shipController.set_game_board(&player_board);
 
-    playerShots.setHitScale(0.05f);
-    playerShots.setMissScale(0.03f);
-    enemyShots.setHitScale(0.05f);
-    enemyShots.setMissScale(0.03f);
+    player = new HumanPlayer(player_board, enemy_board);
+    enemy = new ComputerPlayer(enemy_board, player_board);
+
+    player_shots.load_hit("images/Fier.png");
+    player_shots.load_miss("images/Miss.png");
+    enemy_shots.load_hit("images/Fier.png");
+    enemy_shots.load_miss("images/Miss.png");
+
+    player_shots.set_hit_scale(0.05f);
+    player_shots.set_miss_scale(0.03f);
+    enemy_shots.set_hit_scale(0.05f);
+    enemy_shots.set_miss_scale(0.03f);
 
     // Автоматическая расстановка всего флота робота на старте
     enemy->place_ship(ship(0, {}));
 
-    // ВАЖНО ДЛЯ ПОТОКОВ: Отключаем графический контекст окна в текущем (главном) потоке
     window.setActive(false); 
 }
 
-
-void Game::handle_events()
-{
+void Game::handle_events(){
     while (window.pollEvent(event)){
         if (event.type == sf::Event::Closed) {
             window.close();
-            isRunning = false;
+            is_running = false;
         }
 
-        if (state == GameState::Placement) {
+        if (state == game_state::placement) {
             std::vector<sf::Vector2i> coords_list = shipController.handle_event(event, window);
             
-            // Если вектор координат не пустой — значит, игрок успешно зафиксировал корабль
             if (!coords_list.empty()) {
                 ship new_ship(coords_list);
-                player->place_ship(new_ship);  // Теперь проверка уже пройдена в контроллере
+                player->place_ship(new_ship);
                 
                 if (shipController.get_ON()) {
-                    state = GameState::PlayerTurn;
+                    state = game_state::player_turn;
                 }
             }
         }
@@ -107,94 +114,88 @@ void Game::handle_events()
 }
 
 void Game::update(){
-    // ИСПРАВЛЕНО: Двигаем корабли за мышкой только во время фазы расстановки
-    if (state == GameState::Placement) {
+    if (state == game_state::placement) {
         shipController.update(window);
     }
 }
 
-
-
 void Game::render(){
     window.clear();
+    
+    if (state == game_state::game_over) {
+        if (player_won)
+            window.draw(win_sprite);
+        else
+            window.draw(lose_sprite);
+    
+        window.display();
+        return;
+    }
 
     playerBoardView.draw(window);
     enemyBoardView.draw(window);
-
     shipController.draw(window);
-
-    playerShots.draw(window, playerBoardView);
-    enemyShots.draw(window, enemyBoardView);
-
+    player_shots.draw(window, playerBoardView);
+    enemy_shots.draw(window, enemyBoardView);
     window.display();
 }
 
-
-void Game::run()
-{
+void Game::run(){
     window.setActive(false);
 
-    bool wasPressed = false;
-
-    while (window.isOpen()&& isRunning)
-    {
+    while (window.isOpen() && is_running){
         handle_events();
         update();
         render();
-        if (state == GameState::PlayerTurn && 
+        
+        if (state == game_state::player_turn && 
             event.type == sf::Event::MouseButtonPressed &&
-            event.mouseButton.button == sf::Mouse::Left)
-        {
-            // Обработка выстрела здесь
+            event.mouseButton.button == sf::Mouse::Left){
+            
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             sf::Vector2f coords = window.mapPixelToCoords(mousePos);
-            sf::Vector2i targetedCell = enemyBoardView.screenToCell(coords);
+            sf::Vector2i targetedCell = enemyBoardView.screen_to_cell(coords);
             
             if (targetedCell.x != -1){
                 cell shotCell(targetedCell.x, targetedCell.y);
-                if (enemyBoard.can_shoot(shotCell)){
-                    bool hit = enemyBoard.shoot(shotCell);
+                if (enemy_board.can_shoot(shotCell)){
+                    bool hit = enemy_board.shoot(shotCell);
                     if (hit){
-                        enemyShots.addHit(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                        enemy_shots.add_hit(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
                     } else {
-                        enemyShots.addMiss(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
+                        enemy_shots.add_miss(sf::Vector2i(shotCell.get_x(), shotCell.get_y()));
                     }
                     
-                    if (enemyBoard.victory()) {
-                        state = GameState::GameOver;
-                        //you win
+                    if (enemy_board.victory()) {
+                        player_won = true;
+                        state = game_state::game_over;
                     } else if (!hit) {
-                        state = GameState::EnemyTurn;
+                        state = game_state::enemy_turn;
                     }
                 }
             }
-        
-        } else if (state == GameState::EnemyTurn) {
-            // Искусственная пауза в полсекунды, чтобы робот не стрелял мгновенно
+        } 
+        else if (state == game_state::enemy_turn) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             cell enemyShot = enemy->take_turn();
             
-            bool hit = playerBoard.shoot(enemyShot); // Робот стреляет по нам
+            bool hit = player_board.shoot(enemyShot);
             
             if (hit) {
-                // Если робот попал, передаем координату выстрела в систему отрисовки огня
-                playerShots.addHit(enemyShot.to_sf());
+                player_shots.add_hit(enemyShot.to_sf());
             } else {
-                playerShots.addMiss(enemyShot.to_sf());  //  крестик
+                player_shots.add_miss(enemyShot.to_sf());
             }
 
-            if (playerBoard.victory()) {
-                state = GameState::GameOver;
-                //you lose
+            if (player_board.victory()) {
+                player_won = false;
+                state = game_state::game_over;
             } else if (!hit) {
-                state = GameState::PlayerTurn; // Робот промахнулся — возвращаем ход человеку
+                state = game_state::player_turn;
             }
         }
 
-        // Небольшая разгрузка для процессора, чтобы бесконечный цикл логики не грузил ядро на 100%
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
-
-    

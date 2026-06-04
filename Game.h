@@ -1,54 +1,54 @@
+#pragma once
+
 #include <atomic>
 #include <thread>
 #include "Board_view.h"
 #include "Ship_controller.h"
 #include "Fier_view.h"
-
 #include "Board.h"
 #include "Player.h"
 #include "Ship.h"
 
-// Состояния игры
-enum class GameState {
-    Placement,   // Фаза расстановки кораблей игроком
-    PlayerTurn,  // Ход игрока (ожидание клика по вражескому полю)
-    EnemyTurn,   // Ход компьютера
-    GameOver     // Игра окончена
+enum class game_state {
+    placement,
+    player_turn,
+    enemy_turn,
+    game_over
 };
 
-class Game
-{
+class Game {
 private:
-
-    ShotView playerShots;
-    ShotView enemyShots;
+    ShotView player_shots;  // shot_view → ShotView
+    ShotView enemy_shots;   // shot_view → ShotView
 
     sf::RenderWindow window;
     sf::Event event;
 
-    BoardView playerBoardView;
-    BoardView enemyBoardView;
+    board_view playerBoardView;
+    board_view enemyBoardView;
 
     ship_controller shipController;
 
-    board playerBoard;
-    board enemyBoard;
+    board player_board;
+    board enemy_board;
 
     sf::Texture t4, t3, t2, t1;
+    sf::Texture win_texture, lose_texture;
+    sf::Sprite win_sprite, lose_sprite;
 
     HumanPlayer* player;
     ComputerPlayer* enemy;
 
-    std::atomic<bool> isRunning{ true }; // Флаг работы игры для синхронизации потоков
-    std::atomic<GameState> state{ GameState::Placement }; // Текущая фаза игры
-    std::thread renderThread;           // Поток для отрисовки графики
+    std::atomic<bool> is_running{ true };
+    std::atomic<game_state> state{ game_state::placement };  // GameState → game_state
+    bool player_won = false;
 
     void handle_events();
     void update();
     void render();
-    void render_loop(); // Метод, который будет выполняться в отдельном потоке
-
     void init();
+
+    std::thread renderThread; 
 
 public:
     Game();

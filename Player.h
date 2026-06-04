@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream> 
 #include <string> 
 #include <mutex> 
@@ -25,28 +27,23 @@ class Player {
                 own_board.place_ship(new_ship);
             }
         }
-       // cell take_turn(cell sh) override {
-          //  if (enemy_board.can_shoot(sh)){
-         //       enemy_board.shoot(sh);
-         //   }
-    //    }
-    
     };
     
 class ComputerPlayer : public Player {
     private: 
+        //смещения 
         const int dx[4] = {-1, 1, 0, 0};
         const int dy[4] = {0, 0, -1, 1};
     
-        std::vector<cell> target_queue;
-        std::set<std::pair<int,int>> sunk_ship_zones;
+        std::vector<cell> target_queue; //очередь для добивания
+        std::set<std::pair<int,int>> dead_ship_zones;
     
-        bool is_ship_sunk(const std::vector<cell>& hits_cluster);
-        void update_sunk_ships();
+        bool is_ship_dead(const std::vector<cell>& hits_cluster) const;
+        void update_dead_ships();
     
-        std::vector<cell> find_free_cells(char ch);
+        std::vector<cell> find_cells(char ch) const;
         void count_free_sect(int start_x, int end_x, int start_y, int end_y, int& result) const;
-        cell find_sector(int x1, int x2, int y1, int y2, int depth = 0, int max_depth = 3);
+        cell find_sector(int x1, int x2, int y1, int y2, int depth = 0, int max_depth = 3) const;
     
     public:
         ComputerPlayer(board& own, board& enemy) : Player(own, enemy) {}

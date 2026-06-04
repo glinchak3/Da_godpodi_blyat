@@ -1,9 +1,6 @@
 #pragma once
-#include <fstream>
-#include <iostream>
-#include <mutex>
 
-#pragma once
+#include <iostream>
 #include <SFML/System/Vector2.hpp>
 
 

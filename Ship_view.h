@@ -7,18 +7,15 @@
 class ship_view {
 private:
     sf::Sprite sprite;
-
     int length;
 
 public:
-    ship_view();// конструктор по умолчанию
-    ship_view(int len);// конструктор с длиной
+    ship_view();
+    ship_view(int len);
 
-    void setTexture(sf::Texture& tex, float scale);
-    void setPosition(sf::Vector2f pos);
-
+    void set_texture(sf::Texture& tex, float scale);
+    void set_position(sf::Vector2f pos);
     void draw(sf::RenderWindow& window);
-
-    sf::Sprite& getSprite();
-    std::vector<sf::Vector2i> get_ship_cells(const BoardView& board) const;
+    sf::Sprite& get_sprite();
+    std::vector<sf::Vector2i> get_ship_cells(const board_view& board) const;
 };
