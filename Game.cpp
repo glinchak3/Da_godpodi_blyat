@@ -162,6 +162,7 @@ void Game::run()
                     
                     if (enemyBoard.victory()) {
                         state = GameState::GameOver;
+                        //you win
                     } else if (!hit) {
                         state = GameState::EnemyTurn;
                     }
@@ -185,6 +186,7 @@ void Game::run()
 
             if (playerBoard.victory()) {
                 state = GameState::GameOver;
+                //you lose
             } else if (!hit) {
                 state = GameState::PlayerTurn; // Робот промахнулся — возвращаем ход человеку
             }
